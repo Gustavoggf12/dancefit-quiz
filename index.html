@@ -4,6 +4,24 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Dancefit — Plano de emagrecimento dançando</title>
+
+<!-- ============ Utmify Pixel ============ -->
+<script>
+  window.pixelId = "6a56d83e40894ba5e3cc2d4c";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
+</script>
+<!-- ============ Utmify UTMs ============ -->
+<script
+  src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+  data-utmify-prevent-xcod-sck
+  data-utmify-prevent-subids
+  async
+  defer
+></script>
 <link rel="icon" href="assets/logo.png" type="image/png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -391,11 +409,10 @@
 
 <script>
 /* ==========================================================================
-   >>>>>  CONFIGURE AQUI O SEU LINK DE PAGAMENTO  <<<<<
-   Cole o link do seu gateway (Payt, Kiwify, Hotmart, Cakto etc.).
-   Quando o usuário clicar em "QUERO COMEÇAR AGORA" será redirecionado.
+   LINK DE PAGAMENTO (Cakto). Ao clicar em "QUERO COMEÇAR AGORA" o usuário é
+   redirecionado, repassando os parâmetros de UTM para rastreio na Utmify.
    ========================================================================== */
-const CHECKOUT_URL = "https://SEU-LINK-DE-CHECKOUT-AQUI.com";
+const CHECKOUT_URL = "https://pay.cakto.com.br/6h9fkko_982011";
 
 /* ---- estado do funil (respostas do usuário) ---- */
 const state = {
@@ -1042,7 +1059,13 @@ function renderResumo(step,wrap){
 }
 
 /* ---------- SALES PAGE ---------- */
-function goCheckout(){ window.location.href = CHECKOUT_URL; }
+function goCheckout(){
+  // repassa os parâmetros de rastreio (utm_source, utm_medium, etc.) para o checkout
+  let url = CHECKOUT_URL;
+  const qs = window.location.search.replace(/^\?/, '');
+  if(qs){ url += (url.includes('?') ? '&' : '?') + qs; }
+  window.location.href = url;
+}
 
 function renderSales(wrap){
   const nome=state.nome?`, ${state.nome}`:'';
