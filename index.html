@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Dancefit — Plano de emagrecimento dançando</title>
+<link rel="icon" href="assets/logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet" />
+<style>
+  /* ============ DESIGN TOKENS (from original inlead config) ============ */
+  :root{
+    --theme:#f87171;          /* themeColor */
+    --theme-dark:#ef4444;
+    --theme-darker:#dc2626;
+    --bg:#fee2e2;             /* backgroundColor */
+    --content:#030712;        /* contentColor */
+    --title:#09090b;          /* titleColor */
+    --card:#ffffff;
+    --muted:#6b7280;
+    --radius:.5rem;           /* rounded-md */
+    --elh:56px;               /* elementSize */
+    --container:44rem;        /* container max-w-[44rem] */
+    --font:'Nunito',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--content);
+    line-height:1.45;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+  /* ============ SHELL / HEADER ============ */
+  .app{min-height:100dvh;display:flex;flex-direction:column}
+  header.topbar{
+    background:var(--card);
+    box-shadow:0 1px 0 rgba(0,0,0,.06);
+    position:sticky;top:0;z-index:40;
+  }
+  .topbar-inner{
+    max-width:var(--container);margin:0 auto;
+    display:flex;align-items:center;justify-content:center;gap:.6rem;
+    padding:.6rem 1rem .5rem;position:relative;
+  }
+  .topbar img{height:64px;width:auto}
+  .back-btn{
+    position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+    font-size:1.4rem;color:#9ca3af;line-height:1;padding:.2rem .4rem;display:none;
+  }
+  .back-btn.show{display:block}
+  /* progress bar */
+  .progress-wrap{max-width:var(--container);margin:0 auto;width:100%;padding:0 1rem}
+  .progress-track{height:6px;background:#fecaca;border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--theme);width:0;border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+  /* ============ MAIN / STEP ============ */
+  main{flex:1;width:100%;max-width:var(--container);margin:0 auto;padding:1.4rem 1rem 3rem}
+  .step{animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  h1.q-title{font-size:1.55rem;font-weight:900;color:var(--title);text-align:center;letter-spacing:-.02em;line-height:1.15;margin-bottom:.4rem}
+  h1.q-title.sm{font-size:1.3rem}
+  h1.q-title em{color:var(--theme);font-style:normal}
+  h1.hero-h{font-size:2rem;margin-bottom:.7rem}
+  p.q-sub{text-align:center;color:var(--muted);font-size:.98rem;font-weight:600;margin-bottom:1.4rem;max-width:34rem;margin-left:auto;margin-right:auto}
+
+  /* option list */
+  .options{display:flex;flex-direction:column;gap:.65rem;max-width:32rem;margin:0 auto}
+  .options.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+  .opt{
+    background:var(--card);border:2px solid #fecdd3;border-radius:var(--radius);
+    min-height:var(--elh);padding:.85rem 1.1rem;display:flex;align-items:center;gap:.8rem;
+    font-weight:700;font-size:1.02rem;color:var(--title);text-align:left;transition:all .15s;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);width:100%;
+  }
+  .opt:hover{border-color:var(--theme)}
+  .opt:active{transform:scale(.985)}
+  .opt.selected{border-color:var(--theme);background:#fff1f2;box-shadow:0 0 0 3px rgba(248,113,113,.25)}
+  .opt .emoji{font-size:1.5rem;line-height:1;flex-shrink:0}
+  .opt .op-main{display:flex;flex-direction:column;gap:.1rem}
+  .opt .op-desc{font-weight:600;font-size:.8rem;color:var(--muted)}
+  .opt.center{justify-content:center;text-align:center}
+  .opt.card-grid{flex-direction:column;text-align:center;justify-content:center;gap:.5rem;padding:1.1rem .6rem;min-height:118px}
+  .opt.card-grid .emoji{font-size:2rem}
+  /* layout com imagem lateral (mulher dançando à esquerda, sem sobrepor nada) */
+  .side-layout{display:grid;grid-template-columns:minmax(96px,34%) 1fr;gap:.5rem;align-items:end;max-width:34rem;margin:0 auto}
+  .side-img{width:100%;object-fit:contain;margin-bottom:.2rem}
+  .side-opts{min-width:0}
+  .side-opts .options{max-width:none;margin:0}
+  .opt .emoji-right{margin-left:auto;font-size:1.5rem;flex-shrink:0}
+  .opt.emoji-side{justify-content:space-between}
+
+  /* checkbox option */
+  .opt.has-check{padding-left:.9rem}
+  .opt-check{width:24px;height:24px;flex-shrink:0;border:2px solid #f9a8bc;border-radius:.35rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.9rem;background:#fff}
+  .opt.selected .opt-check{background:var(--theme);border-color:var(--theme)}
+
+  /* option with right-side thumbnail */
+  .opt.has-img{justify-content:space-between;padding:.55rem .7rem .55rem 1.1rem;min-height:64px}
+  .opt.has-img .op-main{flex:1}
+  .opt-thumb{width:66px;height:52px;object-fit:contain;flex-shrink:0;border-radius:.35rem}
+
+  /* ritmo: big image cards */
+  .ritmo-opts{display:flex;flex-direction:column;gap:.9rem;max-width:32rem;margin:0 auto}
+  .ritmo-card{background:var(--card);border:2px solid #fecdd3;border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .15s}
+  .ritmo-card:hover{border-color:var(--theme)}
+  .ritmo-card.selected{border-color:var(--theme);box-shadow:0 0 0 3px rgba(248,113,113,.3)}
+  .ritmo-head{padding:.8rem 1rem .2rem;font-weight:900;color:var(--title);font-size:1.05rem;text-transform:uppercase;line-height:1.15}
+  .ritmo-head span{display:block;font-size:.82rem;font-weight:700;color:var(--muted);text-transform:none}
+  .ritmo-card img{width:100%;height:190px;object-fit:cover;display:block;margin-top:.5rem}
+
+  /* intersticial */
+  .inter-img{width:100%;max-width:34rem;margin:0 auto;border-radius:var(--radius);display:block}
+  .inter-cap{text-align:center;font-weight:900;color:var(--title);font-size:1.35rem;max-width:34rem;margin:1rem auto 0;line-height:1.2}
+  .cta-count{opacity:.85;font-weight:800}
+
+  /* notícia VivaBem */
+  .news-card{background:#fff;border-radius:var(--radius);overflow:hidden;max-width:34rem;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 3px 12px rgba(0,0,0,.07)}
+  .news-media{padding:0}
+  .news-media img{width:100%;height:auto;display:block}
+  .news-cap{font-size:.72rem;color:#374151;font-weight:600;padding:.5rem .6rem}
+  .news-cap span{color:#9ca3af}
+  .news-body{padding:1rem .9rem;display:flex;flex-direction:column;justify-content:center}
+  .news-hl{font-size:1.35rem;font-weight:900;color:#1d4ed8;line-height:1.15;background:linear-gradient(transparent 60%, #bef264 60%);display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .news-from{font-weight:900;color:var(--title);margin-top:.8rem;font-size:.95rem}
+  .news-footer{text-align:center;font-weight:800;color:var(--title);max-width:34rem;margin:1.2rem auto 0;font-size:.95rem}
+  @media(max-width:480px){.news-hl{font-size:1.05rem}.news-card{grid-template-columns:1fr 1.1fr}}
+
+  /* pain dot no thumbnail */
+  .opt-thumb-wrap{position:relative;flex-shrink:0}
+  .pain-dot{position:absolute;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#ef4444 38%,rgba(239,68,68,.4) 68%,transparent 72%);animation:pulse 1.3s infinite;transform:translate(-50%,-50%)}
+  @keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.95}50%{transform:translate(-50%,-50%) scale(1.35);opacity:.55}}
+  /* posições do ponto de dor sobre cada imagem gerada */
+  .pain-costas{top:34%;left:50%}.pain-joelho{top:74%;left:44%}.pain-braco{top:36%;left:42%}.pain-ombro{top:30%;left:52%}
+
+  /* opção de pontos sensíveis: imagem vertical sangrando na direita */
+  .opt.sens{padding:0 0 0 1.1rem;min-height:96px;overflow:hidden;align-items:stretch}
+  .opt.sens .op-main{align-self:center;flex:1;padding:.6rem 0}
+  .sens-wrap{position:relative;width:92px;flex-shrink:0;align-self:stretch}
+  .sens-thumb{width:92px;height:100%;object-fit:cover;object-position:center 18%;border-radius:0}
+
+  /* chart projeção peso */
+  .chart-tags{display:flex;justify-content:space-between;margin-bottom:.2rem}
+  .chart-tags span{background:#fff;border:1px solid #e5e7eb;border-radius:.4rem;padding:.2rem .6rem;font-size:.75rem;font-weight:800;color:var(--title)}
+  .chart-note{background:#fff;border-radius:var(--radius);padding:.9rem 1rem;max-width:34rem;margin:1rem auto 0;font-size:.85rem;color:var(--content);font-weight:600;line-height:1.4}
+  .pill-red{background:#ef4444;color:#fff;font-weight:900;padding:.05rem .45rem;border-radius:.3rem}
+  .pill-green{background:#22c55e;color:#fff;font-weight:900;padding:.05rem .45rem;border-radius:.3rem}
+
+  /* loader2 (barra + carrossel comentários) */
+  .loader2{max-width:40rem;margin:0 auto;text-align:center}
+  .l2-head{display:flex;justify-content:space-between;font-weight:700;color:var(--title);font-size:.9rem;margin-bottom:.4rem}
+  .l2-track{height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+  .l2-fill{height:100%;background:#eab308;width:0;border-radius:99px;transition:width .2s}
+  .l2-lead{font-weight:800;color:var(--title);margin:1.2rem 0 2rem;font-size:1rem}
+  .l2-carousel{overflow:hidden;width:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .l2-track-inner{display:flex;gap:1rem;width:max-content;animation:slide 55s linear infinite}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .l2-comment{background:#fff;border-radius:1rem;padding:1.1rem;width:300px;flex-shrink:0;text-align:left;box-shadow:0 8px 22px rgba(0,0,0,.07)}
+  .l2c-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
+  .l2c-av{width:40px;height:40px;border-radius:50%;background:var(--theme);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0}
+  .l2-comment .stars{color:#f59e0b;font-size:.85rem;margin-bottom:.35rem}
+  .l2c-name{font-weight:900;color:var(--title);font-size:.95rem;display:block}
+  .l2c-h{color:var(--muted);font-size:.8rem;font-weight:600;display:block}
+  .l2c-t{color:var(--content);font-weight:600;font-size:.9rem;line-height:1.4}
+
+  /* IMC resumo */
+  .imc-top{display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:center;max-width:34rem;margin:0 auto 1.2rem}
+  .imc-char{width:150px;border-radius:var(--radius)}
+  .imc-cards{display:flex;flex-direction:column;gap:.55rem}
+  .imc-cardbox{background:#fff;border-radius:var(--radius);padding:.6rem .85rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .imc-cardbox p{font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:.05rem}
+  .imc-cardbox b{font-size:1.05rem;color:var(--title);font-weight:900}
+  .imc-label{font-weight:900;color:var(--title);max-width:34rem;margin:.5rem auto .2rem;font-size:.95rem}
+  .imc-obs{font-size:.8rem;color:var(--muted);font-weight:700;max-width:34rem;margin:0 auto}
+  .imc-bar-wrap{max-width:34rem;margin:1.4rem auto .4rem;position:relative;padding-top:2rem}
+  .imc-badge{position:absolute;top:0;transform:translateX(-50%);background:#18181b;color:#fff;font-weight:800;font-size:.8rem;padding:.3rem .7rem;border-radius:.4rem;white-space:nowrap;max-width:calc(100vw - 3rem)}
+  .imc-badge::after{content:'';position:absolute;bottom:-5px;left:var(--arrow,50%);transform:translateX(-50%);border:5px solid transparent;border-top-color:#18181b;border-bottom:0}
+  .imc-bar{height:10px;border-radius:99px;background:linear-gradient(to right,#14b8a6,#84cc16,#eab308,#f97316,#ef4444)}
+  .imc-marker{position:absolute;top:calc(2rem - 4px);width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid var(--theme);transform:translateX(-50%);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .imc-alert{background:#fff;border-radius:var(--radius);padding:.9rem 1rem;max-width:34rem;margin:1.2rem auto 0;font-size:.82rem;color:var(--content);font-weight:600;line-height:1.4;border-left:4px solid var(--theme)}
+
+  /* CTA button */
+  .cta{
+    display:block;width:100%;max-width:32rem;margin:1.4rem auto 0;
+    background:var(--theme);color:#fff;font-weight:900;font-size:1.05rem;letter-spacing:.01em;
+    min-height:var(--elh);border-radius:var(--radius);padding:.9rem;text-transform:uppercase;
+    box-shadow:0 6px 16px rgba(248,113,113,.4);transition:all .15s;
+  }
+  .cta:hover{background:var(--theme-dark)}
+  .cta:active{transform:translateY(1px)}
+  .cta[disabled]{opacity:.45;pointer-events:none;box-shadow:none}
+  .cta.big{font-size:1.15rem;min-height:62px}
+
+  /* social proof card (horizontal) */
+  .sp-card{
+    background:#fff;border-radius:1.5rem;padding:.9rem 1.1rem;margin:0 auto 1.6rem;max-width:33rem;
+    display:flex;align-items:center;gap:.7rem;box-shadow:0 6px 20px rgba(0,0,0,.06);
+  }
+  .sp-avatars{display:flex;flex-shrink:0}
+  .sp-avatars img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:3px solid #fff;margin-left:-14px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .sp-avatars img:first-child{margin-left:0}
+  .sp-heart{width:44px;height:44px;border-radius:50%;background:var(--theme);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;margin-left:.2rem;animation:beat 1.1s infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}20%{transform:scale(1.18)}40%{transform:scale(1)}}
+  .sp-text{font-weight:700;color:var(--title);font-size:.95rem;line-height:1.25}
+  .sp-text b{color:var(--title);font-weight:900}
+
+  /* faixa etária cards (photo + coral banner) */
+  .faixa-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;max-width:33rem;margin:0 auto}
+  .faixa-card{background:#fff;border:2px solid #fecdd3;border-radius:var(--radius);overflow:hidden;transition:all .15s;cursor:pointer;padding:0}
+  .faixa-card:hover{border-color:var(--theme)}
+  .faixa-card:active{transform:scale(.99)}
+  .faixa-card.selected{border-color:var(--theme);box-shadow:0 0 0 3px rgba(248,113,113,.3)}
+  .faixa-photo{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;padding:.6rem;background:radial-gradient(circle at 50% 45%, #fbb6c4 0%, #f9a8bc 60%, #fecdd3 100%)}
+  .faixa-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .faixa-label{background:var(--theme);color:#fff;font-weight:800;font-size:1.05rem;text-align:center;padding:.85rem .4rem}
+
+  /* secure card (lock in coral square) */
+  .secure{margin:1.8rem auto 0;max-width:33rem;background:#fff;border-radius:1rem;padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+  .secure .lock{width:48px;height:48px;border-radius:.7rem;background:var(--theme);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+  .secure .stxt b{display:block;color:var(--title);font-weight:900;font-size:1rem;margin-bottom:.1rem}
+  .secure .stxt span{color:var(--muted);font-weight:600;font-size:.85rem}
+
+  /* input */
+  .field{max-width:32rem;margin:0 auto}
+  .field input{
+    width:100%;min-height:var(--elh);border:2px solid #fecdd3;border-radius:var(--radius);
+    padding:.9rem 1rem;font-size:1.05rem;font-weight:700;font-family:inherit;background:#fff;color:var(--title);
+  }
+  .field input:focus{outline:none;border-color:var(--theme);box-shadow:0 0 0 3px rgba(248,113,113,.2)}
+
+  /* ruler / slider steps */
+  .measure{max-width:32rem;margin:0 auto;text-align:center}
+  .unit-toggle{display:inline-flex;background:#fecaca;border-radius:99px;padding:4px;margin:0 auto 1.2rem;gap:2px}
+  .unit-toggle button{padding:.4rem 1.3rem;border-radius:99px;font-weight:800;font-size:.95rem;color:var(--theme-darker)}
+  .unit-toggle button.active{background:var(--theme);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .big-value{font-size:2.6rem;font-weight:900;color:var(--title);margin:.3rem 0 .1rem}
+  .big-value small{font-size:1.2rem;color:var(--muted)}
+  .measure .hint{color:var(--muted);font-weight:600;font-size:.85rem;margin-top:.4rem}
+  /* régua interativa com ticks */
+  .ruler{position:relative;height:92px;overflow:hidden;margin:1.1rem 0 0;touch-action:none;cursor:grab;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .ruler:active{cursor:grabbing}
+  .ruler-track{position:absolute;top:8px;left:0;display:flex;height:100%;will-change:transform;transition:transform .07s linear}
+  .tick{flex-shrink:0;position:relative}
+  .tick::before{content:'';position:absolute;left:50%;top:0;width:2px;height:16px;background:#eab6bd;transform:translateX(-50%)}
+  .tick.major::before{height:30px;background:#d98b96}
+  .tick .tlabel{position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:.9rem;color:#8b8b8b;font-weight:600}
+  .ruler::after{content:'';position:absolute;left:0;right:0;top:70px;height:1px;background:#dcb6ba}
+  .ruler-center{position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none}
+  .ruler-needle{width:3px;height:62px;background:var(--theme-darker);border-radius:2px}
+  .ruler-tri{width:0;height:0;border:8px solid transparent;border-bottom-color:var(--theme-darker);border-top:0;margin-top:1px}
+  .bmi-note{background:#fff;border-radius:var(--radius);padding:.9rem 1rem;margin-top:1.2rem;font-size:.85rem;color:var(--muted);font-weight:600}
+
+  /* loader */
+  .loader{max-width:30rem;margin:0 auto;text-align:center}
+  .loader h1{font-size:1.5rem;font-weight:900;color:var(--title);margin-bottom:.5rem}
+  .loader .lead{color:var(--muted);font-weight:700;margin-bottom:1.6rem}
+  .load-list{display:flex;flex-direction:column;gap:.2rem;text-align:left;margin-top:1rem;background:#fff;border-radius:1.2rem;padding:1.2rem 1.1rem;box-shadow:0 10px 30px rgba(0,0,0,.07)}
+  .load-item{padding:.6rem 0;display:flex;align-items:flex-start;gap:.85rem;opacity:.3;transition:opacity .45s;position:relative}
+  .load-item:not(:last-child)::before{content:'';position:absolute;left:14px;top:40px;bottom:-6px;width:2px;background:#fbd3da}
+  .load-item.done,.load-item.active{opacity:1}
+  .load-item .ico{width:30px;height:30px;border-radius:50%;background:#fbd3da;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;position:relative;z-index:1}
+  .load-item.done .ico{background:var(--theme)}
+  .load-item.active .ico{background:var(--theme);animation:beat 1s infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-item b{font-weight:800;color:var(--title);display:block;font-size:.98rem}
+  .load-item span{font-size:.8rem;color:var(--muted);font-weight:600}
+  .circle-pct{font-size:3rem;font-weight:900;color:var(--theme-darker);margin:1rem 0 .4rem}
+
+  /* chart */
+  .chart-card{background:#fff;border-radius:1rem;padding:1.2rem 1rem 1rem;max-width:34rem;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .chart-svg{width:100%;height:auto;display:block}
+  .chart-line{stroke-dasharray:1400;stroke-dashoffset:1400;animation:dashdraw 1.8s ease-out forwards}
+  @keyframes dashdraw{to{stroke-dashoffset:0}}
+  .chart-legend{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;color:var(--muted);margin-top:.4rem;padding:0 .3rem}
+  .goal-line{text-align:center;font-weight:800;margin:1rem auto;color:var(--title)}
+  .goal-line b{color:var(--theme-darker)}
+
+  /* plano final (personagem + cards coral) */
+  .plano-hero{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:center;max-width:34rem;margin:0 auto .3rem}
+  .plano-hero img{width:130px;height:130px;border-radius:50%;object-fit:cover;background:radial-gradient(circle,#fbb6c4,#fecdd3)}
+  .plano-title{text-align:center}
+  .plano-title span{display:block;color:var(--muted);font-weight:700;font-size:.9rem}
+  .plano-title b{display:block;color:var(--theme);font-weight:900;font-size:2rem;line-height:1}
+  .plano-title em{display:block;color:var(--title);font-weight:900;font-size:1.3rem;font-style:normal}
+  .plano-list{display:flex;flex-direction:column;gap:.6rem;max-width:34rem;margin:1rem auto 0}
+  .plano-box{background:#fff;border-radius:var(--radius);padding:.75rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,.05);opacity:0;transform:translateY(14px);transition:all .5s ease}
+  .plano-box.show{opacity:1;transform:none}
+  .plano-box b{display:block;color:var(--theme);font-weight:900;font-size:.98rem;margin-bottom:.15rem}
+  .plano-box span{color:var(--content);font-weight:700;font-size:.95rem}
+
+  /* plan summary card */
+  .plan-card{background:#fff;border-radius:1rem;padding:1.2rem;max-width:34rem;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+  .plan-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px dashed #f3d0d4;gap:1rem}
+  .plan-row:last-child{border-bottom:none}
+  .plan-row .lbl{color:var(--muted);font-weight:700;font-size:.9rem}
+  .plan-row .val{color:var(--title);font-weight:900;text-align:right}
+
+  /* ===== SALES PAGE ===== */
+  .sales{max-width:34rem;margin:0 auto}
+  .sales h1{font-size:1.5rem;font-weight:900;text-align:center;color:var(--title);margin-bottom:1.2rem;line-height:1.15}
+  .benefit{background:#fff;border-radius:var(--radius);padding:.85rem 1rem;display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.55rem;font-weight:700;font-size:.95rem}
+  .benefit .ck{color:#16a34a;font-weight:900;flex-shrink:0}
+  .timer{display:flex;align-items:center;justify-content:center;gap:.5rem;margin:1.6rem 0 .4rem}
+  .timer i{font-style:normal;font-weight:900;font-size:1.5rem;color:var(--theme-darker)}
+  .timer .tu{background:#fff;border-radius:.6rem;padding:.4rem .8rem;min-width:64px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.08)}
+  .timer .tu b{display:block;font-size:1.6rem;font-weight:900;color:var(--theme-darker);line-height:1}
+  .timer .tu span{font-size:.68rem;color:var(--muted);font-weight:700}
+  .price-box{background:#fff;border:2px solid var(--theme);border-radius:1rem;padding:1.3rem;text-align:center;margin:1rem 0}
+  .price-tag{font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .price-main{font-size:2.6rem;font-weight:900;color:var(--title);margin:.2rem 0}
+  .price-main span{font-size:1.1rem;color:var(--theme-darker)}
+  .price-alt{color:var(--muted);font-weight:700;font-size:.95rem;margin-bottom:1rem}
+  .secure-tag{text-align:center;color:var(--muted);font-weight:700;font-size:.85rem;margin-top:.7rem}
+  .guarantee{background:#fff;border-radius:1rem;padding:1.2rem;text-align:center;margin:1.6rem 0}
+  .guarantee img{width:120px;margin:0 auto .6rem}
+  .guarantee h3{font-weight:900;color:var(--title);margin-bottom:.4rem}
+  .guarantee p{font-size:.88rem;color:var(--muted);font-weight:600}
+  .results-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1rem 0}
+  .results-grid img{border-radius:var(--radius);width:100%;object-fit:cover;aspect-ratio:1/1}
+  .section-h{text-align:center;font-weight:900;font-size:1.2rem;color:var(--title);margin:2rem 0 1rem}
+  .faq-item{background:#fff;border-radius:var(--radius);margin-bottom:.55rem;overflow:hidden}
+  .faq-q{padding:.95rem 1rem;font-weight:800;color:var(--title);display:flex;justify-content:space-between;align-items:center;gap:1rem;font-size:.98rem}
+  .faq-q .chev{transition:transform .25s;color:var(--theme-darker)}
+  .faq-item.open .chev{transform:rotate(180deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s;padding:0 1rem;color:var(--muted);font-weight:600;font-size:.9rem}
+  .faq-item.open .faq-a{max-height:400px;padding:0 1rem 1rem}
+  .testi{background:#fff;border-radius:var(--radius);padding:1rem;margin-bottom:.6rem;display:flex;gap:.8rem;align-items:flex-start}
+  .testi .av{width:44px;height:44px;border-radius:50%;background:var(--theme);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0}
+  .testi .name{font-weight:900;color:var(--title);font-size:.92rem}
+  .testi .handle{color:var(--theme-darker);font-size:.78rem;font-weight:700}
+  .testi .txt{font-weight:600;font-size:.9rem;color:var(--content);margin-top:.25rem}
+  .stars{color:#f59e0b;font-size:.8rem}
+  .bandeiras{max-width:220px;margin:1rem auto 0;opacity:.85}
+
+  /* ===== extras da página de vendas ===== */
+  .cta.green{background:#16a34a;box-shadow:0 6px 16px rgba(22,163,74,.35)}
+  .cta.green:hover{background:#15803d}
+  .hero-compare{background:#fff;border-radius:1rem;padding:.5rem;max-width:34rem;margin:0 auto 1.2rem;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+  .hero-compare img{width:100%;border-radius:.7rem}
+  .access-card{background:#fff;border-radius:var(--radius);padding:.9rem 1rem;max-width:34rem;margin:0 auto .6rem;font-weight:600;font-size:.92rem;color:var(--content)}
+  .secure-pill{display:inline-flex;align-items:center;gap:.3rem;background:#dcfce7;color:#15803d;font-weight:800;font-size:.82rem;border-radius:.5rem;padding:.35rem .7rem;margin-top:.7rem}
+  .center-pill{display:flex;justify-content:center;width:max-content;margin:1rem auto 0}
+  .pay-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-top:.8rem;flex-wrap:wrap}
+  .pay-row .bandeiras{margin:0;max-width:180px}
+  .price-box.trial{border-color:#16a34a;text-align:left}
+  .trial-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem}
+  .trial-head b{font-size:1.15rem;color:var(--title);display:block}
+  .trial-head span{color:var(--muted);font-weight:700;font-size:.9rem}
+  .trial-price{text-align:right;background:#f8fafc;border-radius:.6rem;padding:.4rem .7rem;flex-shrink:0}
+  .trial-price small{display:block;font-size:.7rem;color:var(--muted);font-weight:700}
+  .trial-price b{font-size:1.5rem;color:var(--title)}
+  .section-h em{color:#a855f7;font-style:normal}
+  .seal7{width:140px;margin:1.6rem auto .4rem;display:block}
+  .carousel-wrap{max-width:34rem;margin:0 auto}
+  .carousel{overflow:hidden;position:relative;border-radius:1rem;box-shadow:0 6px 20px rgba(0,0,0,.07)}
+  .car-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+  .car-slide{min-width:100%;background:#fff}
+  .car-slide img{width:100%;height:360px;object-fit:cover;object-position:top center;display:block}
+  .car-dots{display:flex;gap:.45rem;justify-content:center;margin:.7rem 0 0}
+  .car-dot{width:9px;height:9px;border-radius:50%;background:#f4b0bb;cursor:pointer;transition:all .2s}
+  .car-dot.on{background:var(--theme-darker);transform:scale(1.25)}
+
+  footer{background:#fff;text-align:center;padding:1.4rem 1rem;color:var(--muted);font-size:.78rem;font-weight:600}
+
+  @media(max-width:420px){
+    h1.q-title{font-size:1.35rem}
+    .opt.card-grid{min-height:104px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" id="backBtn" aria-label="Voltar">‹</button>
+      <img src="assets/logo.png" alt="Dancefit" />
+    </div>
+    <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progress"></div></div></div>
+  </header>
+  <main id="main"></main>
+  <footer>
+    © <span id="year"></span> Dancefit — Todos os direitos reservados. &nbsp;|&nbsp; Este site é uma réplica para fins de estudo.
+  </footer>
+</div>
+
+<script>
+/* ==========================================================================
+   >>>>>  CONFIGURE AQUI O SEU LINK DE PAGAMENTO  <<<<<
+   Cole o link do seu gateway (Payt, Kiwify, Hotmart, Cakto etc.).
+   Quando o usuário clicar em "QUERO COMEÇAR AGORA" será redirecionado.
+   ========================================================================== */
+const CHECKOUT_URL = "https://SEU-LINK-DE-CHECKOUT-AQUI.com";
+
+/* ---- estado do funil (respostas do usuário) ---- */
+const state = {
+  faixa:null, objetivo:null, fisico:null, corpoSonho:null, foco:[], sensiveis:[],
+  melhorForma:null, experiencia:null, metabolismo:null, frequencia:null,
+  duracao:null, ritmo:null, altura:180, peso:70, metaPeso:65, nome:"",
+  evento:null, unidadeAltura:"cm", unidadePeso:"kg"
+};
+
+/* ============ DEFINIÇÃO DAS TELAS DO FUNIL ============ */
+const STEPS = [
+  /* 0 — landing + faixa etária */
+  { type:"landing", key:"faixa",
+    title:'Seu plano de <em>emagrecimento dançando</em> começa aqui',
+    sub:"Responda rapidinho e receba seu plano ideal",
+    q:"Qual a sua faixa etária?",
+    options:[
+      {label:"40 a 49 anos", img:"assets/faixa-40.png"},
+      {label:"50+ anos", img:"assets/faixa-50.png"}
+    ]},
+  /* 1 — objetivo */
+  { type:"single", key:"objetivo", advance:true,
+    title:"Qual é o seu objetivo principal?",
+    sub:"Vamos começar sua jornada com as suas metas!",
+    options:[
+      {label:"Perder peso", img:"assets/opt/obj-perder.webp"},
+      {label:"Ficar em forma", img:"assets/opt/obj-forma.webp"},
+      {label:"Aprender a dançar", img:"assets/opt/obj-dancar.webp"}]},
+  /* 2 — físico atual */
+  { type:"single", key:"fisico",
+    title:"Como você descreveria seu físico atual?",
+    options:[
+      {label:"Padrão", img:"assets/opt/fis-padrao.png"},
+      {label:"Flácida", img:"assets/opt/fis-flacida.png"},
+      {label:"EXTRA", img:"assets/opt/fis-extra.png"}]},
+  /* 3 — corpo dos sonhos */
+  { type:"single", key:"corpoSonho",
+    title:"Como seria o seu “corpo dos sonhos”?",
+    options:[
+      {label:"Ajustado", img:"assets/opt/sonho-ajustado.png"},
+      {label:"Definido", img:"assets/opt/sonho-definido.png"},
+      {label:"Com curvas", img:"assets/opt/sonho-curvas.png"},
+      {label:"Um pouco mais magro que antes", img:"assets/opt/sonho-magro.png"}]},
+  /* interstitial — você está no lugar certo (sem delay) */
+  { type:"interstitial",
+    title:"Você está no lugar certo!",
+    img:"assets/mulheres-40plus.jpg",
+    caption:"Vamos criar o seu plano personalizado" },
+  /* 4 — foco (múltipla) com imagem lateral + checkbox */
+  { type:"multi", key:"foco", advance:true, sideImg:"assets/leti.png", checkbox:true,
+    title:"Quais partes do seu corpo você está mais focada em melhorar?",
+    options:[
+      {label:"Braços tonificados"},{label:"Barriga plana"},{label:"Bumbum redondo"},
+      {label:"Pernas"},{label:"Emagrecimento total"}]},
+  /* 5 — melhor forma (emojis à direita, como no original) */
+  { type:"single", key:"melhorForma", emojiSide:"right",
+    title:"Há quanto tempo você estava na melhor forma da sua vida?",
+    options:[
+      {label:"Menos de um ano atrás", emoji:"🤔"},
+      {label:"Entre 1 e 2 anos atrás", emoji:"😅"},
+      {label:"Mais de 3 anos atrás", emoji:"😢"},
+      {label:"Estou feliz com a minha imagem corporal", emoji:"😌"},
+      {label:"Nunca", emoji:"❌"}]},
+  /* 6 — experiência */
+  { type:"single", key:"experiencia",
+    title:"Qual sua experiência dançando?",
+    options:[
+      {label:"Sou iniciante",desc:"estou apenas começando", img:"assets/opt/exp-iniciante.webp"},
+      {label:"Intermediário",desc:"Eu tenho alguma experiência", img:"assets/opt/exp-inter.webp"},
+      {label:"Experiente",desc:"Sou competente na dança", img:"assets/opt/exp-experiente.webp"}]},
+  /* 7 — metabolismo (frase) */
+  { type:"single", key:"metabolismo",
+    title:"Qual frase combina mais com você?",
+    options:[
+      {label:"ENGORDO COM FACILIDADE", img:"assets/opt/frase-engordo.webp"},
+      {label:"MEU PESO VARIA BASTANTE", img:"assets/opt/frase-varia.webp"},
+      {label:"TENHO DIFICULDADE PARA EMAGRECER", img:"assets/opt/frase-dificuldade.webp"},
+      {label:"NÃO TENHO CERTEZA", img:"assets/opt/frase-certeza.webp"}]},
+  /* notícia — você NÃO precisa sofrer (vem depois da pergunta da frase) */
+  { type:"news",
+    title:"Você NÃO precisa sofrer para emagrecer",
+    img:"assets/vivabem-antesdepois.webp",
+    caption:"Jaime e Jean praticam modalidade que combina dança com exercícios de força",
+    source:"Imagem: Reprodução do Instagram",
+    headline:"Mãe e filha emagrecem 83 kg com aula de dança que queima 800 calorias",
+    from:"Do VivaBem",
+    footer:"✨ Exercícios leves funcionam melhor quando são prazerosos. ✨" },
+  /* 8 — frequência */
+  { type:"single", key:"frequencia",
+    title:"Com que frequência você se exercita?",
+    sub:"O cronograma de treinamento será personalizado de acordo com sua forma física",
+    options:[
+      {label:"Não faço exercícios", img:"assets/opt/freq-nao.webp"},
+      {label:"1-2 vezes por mês", img:"assets/opt/freq-mes.webp"},
+      {label:"1-2 vezes por semana", img:"assets/opt/freq-semana.webp"},
+      {label:"3-4 vezes por semana", img:"assets/opt/freq-34.webp"},
+      {label:"Quase todos os dias", img:"assets/opt/freq-todos.webp"}]},
+  /* 9 — duração */
+  { type:"single", key:"duracao",
+    title:"Quanto tempo você quer que suas danças durem?",
+    sub:"Vamos escolher aulas leves que caibam no seu dia",
+    options:[
+      {label:"0-10 minutos",desc:"só tenho alguns minutinhos", img:"assets/opt/dur-010.webp"},
+      {label:"11-15 minutos",desc:"Consigo fazer rapidinho", img:"assets/opt/dur-1115.webp"},
+      {label:"16-30 minutos",desc:"Posso dedicar um pouco mais", img:"assets/opt/dur-1630.webp"},
+      {label:"Deixe o DANCEFIT decidir", img:"assets/opt/dur-decidir.webp"}]},
+  /* 10 — ritmo (imagens grandes) */
+  { type:"ritmo", key:"ritmo", advance:true,
+    title:"Qual ritmo faria você se animar mais?",
+    sub:"Seu plano será adaptado aos ritmos que você mais gosta 💃",
+    options:[
+      {label:"DANÇAS ANIMADAS",desc:"(FITDANCE/ZUMBA)", img:"assets/opt/ritmo-animada.jpg"},
+      {label:"RITMOS LEVES E DIVERTIDOS",desc:"(SERTANEJO/FORRÓ)", img:"assets/opt/ritmo-leve.webp"},
+      {label:"QUERO QUE O DANCEFIT ESCOLHA PRA MIM",desc:"✨ recomendado para você", img:"assets/opt/ritmo-escolha.jpg"}]},
+  /* 11 — loader 1 */
+  { type:"loader", title:"Criando seu plano de dança...",
+    lead:"Estamos personalizando tudo de acordo com suas preferências e objetivos 💗",
+    items:[
+      {b:"Analisando seu perfil",s:"Entendendo seus objetivos e rotina"},
+      {b:"Escolhendo seus ritmos favoritos",s:"Selecionando estilos que combinam com você"},
+      {b:"Ajustando a intensidade ideal",s:"De acordo com seu nível e tempo livre"},
+      {b:"Montando seu plano personalizado",s:"Criando aulas perfeitas para você"},
+      {b:"Finalizando seu plano DanceFit",s:"Quase pronto!"}]},
+  /* pontos sensíveis (vem depois do loading, como no original) */
+  { type:"multi", key:"sensiveis", advance:true, sensImg:true,
+    title:"Você tem dificuldades com algum dos seguintes pontos?",
+    sub:"Podemos filtrar treinos leves para você",
+    options:[
+      {label:"Tenho costas sensíveis", img:"assets/opt/sens-costas.png", dot:"costas"},
+      {label:"Eu tenho joelhos sensíveis", img:"assets/opt/sens-joelho.png", dot:"joelho"},
+      {label:"Eu tenho braços sensíveis", img:"assets/opt/sens-braco.png", dot:"braco"},
+      {label:"Tenho um ombro sensível", img:"assets/opt/sens-ombro.png", dot:"ombro"},
+      {label:"Nenhuma das anteriores"}]},
+  /* 12 — altura */
+  { type:"altura", title:"Qual é a sua altura?",
+    sub:"O IMC é uma ferramenta comum para avaliar o risco de vários problemas de saúde" },
+  /* 13 — peso */
+  { type:"peso", title:"Qual é o seu peso?" },
+  /* 14 — meta de peso */
+  { type:"metaPeso", title:"Qual é o seu objetivo de peso?" },
+  /* gráfico projeção de peso */
+  { type:"chartPeso", title:"Seu plano personalizado de DANÇA está pronto!" },
+  /* 15 — resumo do nível + IMC */
+  { type:"imcResumo", title:"Obrigado pelas suas respostas! Aqui está o resumo do seu nível de condicionamento físico" },
+  /* 16 — nome */
+  { type:"nome", title:"Qual é o seu nome?",
+    sub:"Queremos criar um plano 100% personalizado para você! Para que tenha o melhor resultado possível" },
+  /* 17 — evento */
+  { type:"single", key:"evento", advance:false,
+    title:"Você tem algum evento importante chegando?",
+    sub:"Ter algo emocionante te esperando fará você se sentir mais motivada.",
+    grid:true,
+    options:[
+      {emoji:"✈️",label:"Férias"},{emoji:"🍻",label:"Casamento"},
+      {emoji:"🏆️",label:"Evento esportivo"},{emoji:"🏝️",label:"Viagem à praia"},
+      {emoji:"🥳",label:"Reunião"},{emoji:"👨‍👩‍👦",label:"Ocasião familiar"},
+      {emoji:"🤔",label:"Outro"},{emoji:"🙅‍♀️",label:"Não"}]},
+  /* 18 — gráfico data */
+  { type:"chartData", title:"Acreditamos que este é o plano que você precisará, diferente de qualquer outro." },
+  /* 19 — loader 2 */
+  { type:"loader2", title:"Criando seu plano personalizado…",
+    lead:"Durante os últimos 30 dias, as usuárias do plano perderam -10kg 😍" },
+  /* 20 — resumo do plano */
+  { type:"resumo", title:"Criamos um plano 100% personalizado com base nas suas respostas" },
+  /* 21 — página de vendas */
+  { type:"sales" }
+];
+
+/* ============ ENGINE ============ */
+let idx = 0;
+const main = document.getElementById('main');
+const progress = document.getElementById('progress');
+const backBtn = document.getElementById('backBtn');
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function fmtDatePlus(days){
+  const d=new Date(); d.setDate(d.getDate()+days);
+  const meses=["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
+  return `${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+function setProgress(){
+  const pct = Math.min(100, Math.round((idx/(STEPS.length-1))*100));
+  progress.style.width = pct+"%";
+  backBtn.classList.toggle('show', idx>0);
+}
+
+function go(n){ idx=Math.max(0,Math.min(STEPS.length-1,n)); render(); window.scrollTo({top:0,behavior:'instant'}); }
+backBtn.onclick = ()=>go(idx-1);
+
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+
+/* render option list (single / multi / landing) */
+function renderOptions(step, container){
+  const box = el(`<div class="options ${step.grid?'grid2':''} ${step.offsetRight?'offset-right':''}"></div>`);
+  step.options.forEach(o=>{
+    const isMulti = step.type==='multi';
+    const selectedVals = isMulti ? state[step.key] : [state[step.key]];
+    const sel = selectedVals && selectedVals.includes(o.label);
+    const b = el(`<button class="opt ${step.grid?'card-grid':''} ${step.checkbox?'has-check':''} ${step.emojiSide==='right'?'emoji-side':''} ${step.sensImg&&o.img?'sens':''} ${(o.desc||o.emoji||o.img||step.checkbox)&&!step.grid?'':'center'} ${o.img?'has-img':''} ${sel?'selected':''}">
+      ${step.checkbox?`<span class="opt-check">${sel?'✓':''}</span>`:''}
+      ${o.emoji&&step.emojiSide!=='right'?`<span class="emoji">${o.emoji}</span>`:''}
+      <span class="op-main"><span>${o.label}</span>${o.desc?`<span class="op-desc">${o.desc}</span>`:''}</span>
+      ${o.emoji&&step.emojiSide==='right'?`<span class="emoji emoji-right">${o.emoji}</span>`:''}
+      ${o.img?`<span class="opt-thumb-wrap ${step.sensImg?'sens-wrap':''}"><img class="opt-thumb ${step.sensImg?'sens-thumb':''}" src="${o.img}" alt="" onerror="this.style.display='none'"/>${o.dot?`<span class="pain-dot pain-${o.dot}"></span>`:''}</span>`:''}
+    </button>`);
+    b.onclick=()=>{
+      if(isMulti){
+        const arr=state[step.key];
+        const i=arr.indexOf(o.label);
+        if(i>=0)arr.splice(i,1); else arr.push(o.label);
+        render(); // refresh selection state + enable CTA
+      }else{
+        state[step.key]=o.label;
+        if(step.advance){ render(); } // show highlight then user taps continue
+        else { setTimeout(()=>go(idx+1),180); }
+      }
+    };
+    box.appendChild(b);
+  });
+  container.appendChild(box);
+}
+
+function render(){
+  const step = STEPS[idx];
+  main.innerHTML='';
+  const wrap = el('<div class="step"></div>');
+
+  switch(step.type){
+    case 'landing':{
+      wrap.appendChild(el(`<h1 class="q-title hero-h">${step.title}</h1>`));
+      wrap.appendChild(el(`<p class="q-sub">${step.sub}</p>`));
+      wrap.appendChild(el(`<div class="sp-card">
+        <div class="sp-avatars">
+          <img src="assets/av1.png" onerror="this.style.display='none'"/>
+          <img src="assets/av2.jpg" onerror="this.style.display='none'"/>
+          <img src="assets/av3.jpg" onerror="this.style.display='none'"/>
+        </div>
+        <div class="sp-heart">♥</div>
+        <div class="sp-text"><b>+52.347 mulheres</b> já começaram e estão transformando suas vidas!</div>
+      </div>`));
+      wrap.appendChild(el(`<h1 class="q-title sm" style="margin-bottom:1rem">${step.q}</h1>`));
+      // faixa cards with photo
+      const grid=el(`<div class="faixa-grid"></div>`);
+      step.options.forEach(o=>{
+        const sel = state[step.key]===o.label;
+        const c=el(`<button class="faixa-card ${sel?'selected':''}">
+          <div class="faixa-photo"><img src="${o.img}" alt="${o.label}" onerror="this.style.display='none'"/></div>
+          <div class="faixa-label">${o.label}</div>
+        </button>`);
+        c.onclick=()=>{ state[step.key]=o.label; setTimeout(()=>go(idx+1),200); };
+        grid.appendChild(c);
+      });
+      wrap.appendChild(grid);
+      wrap.appendChild(el(`<div class="secure">
+        <span class="lock">🔒</span>
+        <span class="stxt"><b>100% seguro e sigiloso</b><span>Suas respostas serão usadas apenas para personalizar seu plano.</span></span>
+      </div>`));
+      break;
+    }
+    case 'single': case 'multi':{
+      wrap.appendChild(el(`<h1 class="q-title">${step.title}</h1>`));
+      if(step.sub) wrap.appendChild(el(`<p class="q-sub">${step.sub}</p>`));
+      if(step.sideImg){
+        const row=el(`<div class="side-layout"></div>`);
+        row.appendChild(el(`<img class="side-img" src="${step.sideImg}" alt="" onerror="this.style.display='none'"/>`));
+        const col=el(`<div class="side-opts"></div>`);
+        renderOptions(step, col);
+        row.appendChild(col);
+        wrap.appendChild(row);
+      } else {
+        renderOptions(step, wrap);
+      }
+      const need = step.type==='multi' ? state[step.key].length>0 : !!state[step.key];
+      if(step.advance || step.type==='multi'){
+        const cta = el(`<button class="cta" ${need?'':'disabled'}>Continuar</button>`);
+        cta.onclick=()=>go(idx+1);
+        wrap.appendChild(cta);
+      }
+      break;
+    }
+    case 'ritmo':{
+      wrap.appendChild(el(`<h1 class="q-title">${step.title}</h1>`));
+      if(step.sub) wrap.appendChild(el(`<p class="q-sub">${step.sub}</p>`));
+      const box=el(`<div class="ritmo-opts"></div>`);
+      step.options.forEach(o=>{
+        const sel=state[step.key]===o.label;
+        const c=el(`<div class="ritmo-card ${sel?'selected':''}">
+          <div class="ritmo-head">${o.label}<span>${o.desc||''}</span></div>
+          <img src="${o.img}" alt="" onerror="this.style.display='none'"/>
+        </div>`);
+        c.onclick=()=>{ state[step.key]=o.label; render(); };
+        box.appendChild(c);
+      });
+      wrap.appendChild(box);
+      const cta=el(`<button class="cta" ${state[step.key]?'':'disabled'}>Continuar</button>`);
+      cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
+      break;
+    }
+    case 'interstitial': renderInterstitial(step,wrap); break;
+    case 'news': renderNews(step,wrap); break;
+    case 'chartPeso': renderChartPeso(step,wrap); break;
+    case 'imcResumo': renderImc(step,wrap); break;
+    case 'loader': renderLoader(step,wrap,false); break;
+    case 'loader2': renderLoader(step,wrap,true); break;
+    case 'altura': renderRuler(wrap,'altura','cm','pol',140,220,'Calculando seu índice de massa corporal (IMC)',step.sub); break;
+    case 'peso': renderRuler(wrap,'peso','kg','lb',40,180,null,null,step.title); break;
+    case 'metaPeso': renderRuler(wrap,'metaPeso','kg','lb',40,180,null,null,step.title); break;
+    case 'nome':{
+      wrap.appendChild(el(`<h1 class="q-title">${step.title}</h1>`));
+      wrap.appendChild(el(`<p class="q-sub">${step.sub}</p>`));
+      const field=el(`<div class="field"><input id="nomeInput" type="text" placeholder="Digite seu nome..." value="${state.nome}"/></div>`);
+      wrap.appendChild(field);
+      const cta=el(`<button class="cta" ${state.nome.trim()?'':'disabled'}>Continuar</button>`);
+      wrap.appendChild(cta);
+      setTimeout(()=>{
+        const inp=field.querySelector('input');
+        inp.oninput=()=>{state.nome=inp.value; cta.toggleAttribute('disabled', !inp.value.trim());};
+        cta.onclick=()=>{ if(state.nome.trim()) go(idx+1); };
+      });
+      break;
+    }
+    case 'chartData': renderChartData(step,wrap); break;
+    case 'resumo': renderResumo(step,wrap); break;
+    case 'sales': renderSales(wrap); break;
+  }
+  main.appendChild(wrap);
+  setProgress();
+}
+
+/* ---------- INTERSTICIAL (com delay) ---------- */
+function renderInterstitial(step,wrap){
+  wrap.appendChild(el(`<h1 class="q-title" style="margin-bottom:1rem">${step.title}</h1>`));
+  wrap.appendChild(el(`<img class="inter-img" src="${step.img}" alt="" onerror="this.style.display='none'"/>`));
+  wrap.appendChild(el(`<div class="inter-cap">${step.caption}</div>`));
+  addDelayedCta(step,wrap);
+}
+
+/* ---------- NOTÍCIA (VivaBem, com delay) ---------- */
+function renderNews(step,wrap){
+  wrap.appendChild(el(`<h1 class="q-title" style="text-align:left;max-width:34rem;margin:0 auto 1rem">${step.title}</h1>`));
+  wrap.appendChild(el(`<div class="news-card">
+    <div class="news-media">
+      <img src="${step.img}" alt="" onerror="this.style.display='none'"/>
+      <p class="news-cap">${step.caption}<br><span>${step.source}</span></p>
+    </div>
+    <div class="news-body">
+      <h2 class="news-hl">${step.headline}</h2>
+      <p class="news-from">${step.from}</p>
+    </div>
+  </div>`));
+  wrap.appendChild(el(`<p class="news-footer">${step.footer}</p>`));
+  addDelayedCta(step,wrap);
+}
+
+/* CTA que só habilita após `delay` segundos (mecânica do original) */
+function addDelayedCta(step,wrap){
+  const secs = step.delay||0;
+  const cta = el(`<button class="cta" ${secs?'disabled':''}>Continuar${secs?` <span class="cta-count">(${secs})</span>`:''}</button>`);
+  cta.onclick=()=>{ if(!cta.hasAttribute('disabled')) go(idx+1); };
+  wrap.appendChild(cta);
+  if(secs){
+    let left=secs;
+    const t=setInterval(()=>{
+      left--;
+      const c=cta.querySelector('.cta-count');
+      if(left<=0){ clearInterval(t); cta.removeAttribute('disabled'); cta.innerHTML='Continuar'; }
+      else if(c){ c.textContent=`(${left})`; }
+    },1000);
+  }
+}
+
+/* ---------- CHART: projeção de peso (curva multicolorida) ---------- */
+function renderChartPeso(step,wrap){
+  wrap.appendChild(el(`<h1 class="q-title">${step.title}</h1>`));
+  const atual=state.peso, meta=state.metaPeso;
+  const card=el(`<div class="chart-card">
+    <div class="chart-tags"><span class="tag-now">Agora</span><span class="tag-end">Em 28 dias</span></div>
+    ${wavySVG(atual,meta)}
+    <div class="chart-legend"><span>PESO ATUAL</span><span>META</span></div>
+  </div>`);
+  wrap.appendChild(card);
+  wrap.appendChild(el(`<div class="goal-line">PESO ATUAL: <span class="pill-red">${atual}Kgs</span> ➡️➡️➡️ META: <span class="pill-green">${meta}Kgs</span></div>`));
+  wrap.appendChild(el(`<div class="chart-note">Com <b>apenas alguns minutos por dia</b> de prática de dança, você pode alcançar sua meta de forma saudável e sustentável</div>`));
+  const cta=el(`<button class="cta" style="background:#f59e0b;box-shadow:0 6px 16px rgba(245,158,11,.4)">Continuar</button>`);
+  cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
+}
+
+/* SVG com curva ondulada e gradiente vermelho→verde (como no print) */
+function wavySVG(atual,meta){
+  const W=520,H=300,padL=34,padR=20,padT=20,padB=40;
+  const x0=padL,x1=W-padR,y0=padT,y1=H-padB;
+  // pontos: começa alto (peso atual), oscila e desce até meta
+  const ys=[0.05,0.28,0.42,0.30,0.62,0.92];
+  const pts=ys.map((v,i)=>[x0+(i/(ys.length-1))*(x1-x0), y0+v*(y1-y0)]);
+  // caminho suave (Catmull-Rom → bezier)
+  function smooth(p){let d=`M ${p[0][0]} ${p[0][1]}`;for(let i=0;i<p.length-1;i++){const p0=p[i-1]||p[i],p1=p[i],p2=p[i+1],p3=p[i+2]||p2;const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;d+=` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2[0]} ${p2[1]}`;}return d;}
+  const line=smooth(pts);
+  const area=line+` L ${x1} ${y1} L ${x0} ${y1} Z`;
+  const grid=[0,20,40,60,80].map(v=>{const y=y1-(v/80)*(y1-y0);return `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#e5e7eb" stroke-dasharray="4 4"/><text x="${x0-6}" y="${y+4}" font-size="11" fill="#9ca3af" text-anchor="end">${v}</text>`;}).join('');
+  const dots=pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#d1d5db" opacity=".7"/><circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="${i===0?'#ef4444':i===pts.length-1?'#22c55e':(i<3?'#ef4444':'#f59e0b')}"/>`).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="gline" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ef4444"/><stop offset="45%" stop-color="#f59e0b"/><stop offset="70%" stop-color="#eab308"/><stop offset="100%" stop-color="#22c55e"/>
+      </linearGradient>
+      <linearGradient id="garea" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ef4444" stop-opacity=".35"/><stop offset="50%" stop-color="#f59e0b" stop-opacity=".3"/><stop offset="100%" stop-color="#22c55e" stop-opacity=".3"/>
+      </linearGradient>
+    </defs>
+    ${grid}
+    <path d="${area}" fill="url(#garea)"/>
+    <path d="${line}" fill="none" stroke="url(#gline)" stroke-width="4" stroke-linecap="round"/>
+    ${dots}
+  </svg>`;
+}
+
+/* ---------- LOADER ---------- */
+function renderLoader(step,wrap,simple){
+  if(simple){
+    const box=el(`<div class="loader2">
+      <div class="l2-head">
+        <span id="l2label">Criando seu plano personalizado…</span>
+        <span id="l2pct">0%</span>
+      </div>
+      <div class="l2-track"><div class="l2-fill" id="l2fill"></div></div>
+      <p class="l2-lead">${step.lead}</p>
+      <div class="l2-carousel"><div class="l2-track-inner" id="l2cards"></div></div>
+    </div>`);
+    wrap.appendChild(box);
+    // comment cards carousel
+    const comments=[
+      {n:"Camila Ferreira",h:"@camila.ferreira",s:5,t:"Nem era só pelo peso, era pelo desânimo mesmo… Hoje tenho muito mais energia e disposição."},
+      {n:"Marta Souza",h:"@martasouza_",s:5,t:"Comecei sem fé nenhuma e me surpreendi. As aulas são curtinhas e dá pra fazer em casa!"},
+      {n:"Patrícia Lima",h:"@paty.lima",s:5,t:"Perdi 6kg no primeiro mês só dançando. Nunca foi tão fácil me exercitar."},
+      {n:"Rose Andrade",h:"@rose.andrade",s:5,t:"Minha autoestima voltou! Recomendo demais pra quem tem mais de 40."},
+      {n:"Fernanda Dias",h:"@fe.dias",s:5,t:"O plano é muito bem montado, cada dia uma aula diferente. Viciei!"}
+    ];
+    const cards=box.querySelector('#l2cards');
+    const mk=c=>{const ini=c.n.split(' ').map(x=>x[0]).slice(0,2).join('');
+      return `<div class="l2-comment"><div class="l2c-top"><span class="l2c-av">${ini}</span><span><span class="l2c-name">${c.n}</span><span class="l2c-h">${c.h}</span></span></div><div class="stars">${'★'.repeat(c.s)}</div><div class="l2c-t">${c.t}</div></div>`;};
+    cards.innerHTML = comments.map(mk).join('') + comments.map(mk).join(''); // duplicado p/ loop infinito
+    // progresso mais lento (~12s) para dar tempo de ler os comentários
+    let p=0; const fill=box.querySelector('#l2fill'),pct=box.querySelector('#l2pct');
+    const iv=setInterval(()=>{ p+=1; if(p>=100){p=100;clearInterval(iv);setTimeout(()=>go(idx+1),800);} if(fill){fill.style.width=p+'%';pct.textContent=p+'%';} },115);
+    return;
+  }
+  const box=el(`<div class="loader"><h1>${step.title}</h1><p class="lead">${step.lead}</p><div class="load-list"></div></div>`);
+  const list=box.querySelector('.load-list');
+  step.items.forEach((it,i)=>list.appendChild(el(`<div class="load-item" data-i="${i}"><span class="ico"></span><span><b>${it.b}</b><span>${it.s}</span></span></div>`)));
+  wrap.appendChild(box);
+  let i=0;
+  const items=[...list.children];
+  function tick(){
+    if(i>0)items[i-1].classList.remove('active'),items[i-1].classList.add('done'),items[i-1].querySelector('.ico').textContent='✓';
+    if(i<items.length){ items[i].classList.add('active'); i++; setTimeout(tick,850); }
+    else { setTimeout(()=>go(idx+1),500); }
+  }
+  tick();
+}
+
+/* ---------- RULER / SLIDER ---------- */
+function renderRuler(wrap,key,u1,u2,min,max,noteTitle,noteBody,titleOverride){
+  const step=STEPS[idx];
+  wrap.appendChild(el(`<h1 class="q-title">${titleOverride||step.title}</h1>`));
+  const isHeight = key==='altura';
+  const unitKey = isHeight?'unidadeAltura':'unidadePeso';
+  const SP=12; // px por unidade da régua
+  const box=el(`<div class="measure">
+    <div class="unit-toggle">
+      <button data-u="${u1}" class="active">${u1}</button>
+      <button data-u="${u2}">${u2}</button>
+    </div>
+    <div class="big-value"><span id="rv">${state[key]}</span><small>${state[unitKey]}</small></div>
+    <div class="ruler" id="ruler">
+      <div class="ruler-track" id="rtrack"></div>
+      <div class="ruler-center"><div class="ruler-needle"></div><div class="ruler-tri"></div></div>
+    </div>
+    <p class="hint">Arraste para ajustar</p>
+    ${noteTitle?`<div class="bmi-note"><b>${noteTitle}</b><br>${noteBody||''}</div>`:''}
+  </div>`);
+  wrap.appendChild(box);
+  const cta=el(`<button class="cta">Continuar</button>`);
+  cta.onclick=()=>go(idx+1);
+  wrap.appendChild(cta);
+  const ruler=box.querySelector('#ruler'), track=box.querySelector('#rtrack'), rv=box.querySelector('#rv');
+  // gera os ticks (traço maior + número a cada 10)
+  let ticks='';
+  for(let v=min;v<=max;v++){
+    const major=v%10===0;
+    ticks+=`<div class="tick ${major?'major':''}" style="width:${SP}px">${major?`<span class="tlabel">${v}</span>`:''}</div>`;
+  }
+  track.innerHTML=ticks;
+  function paint(){
+    const cw=ruler.clientWidth||320;
+    track.style.transform=`translateX(${cw/2-(state[key]-min)*SP-SP/2}px)`;
+    rv.textContent=state[key];
+  }
+  requestAnimationFrame(paint);
+  // arrastar para ajustar (mouse + touch)
+  let dragging=false,startX=0,startVal=0;
+  ruler.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX;startVal=state[key];try{ruler.setPointerCapture(e.pointerId);}catch(_){}});
+  ruler.addEventListener('pointermove',e=>{if(!dragging)return;
+    const dv=Math.round((startX-e.clientX)/SP);
+    state[key]=Math.max(min,Math.min(max,startVal+dv));paint();});
+  ruler.addEventListener('pointerup',()=>dragging=false);
+  ruler.addEventListener('pointercancel',()=>dragging=false);
+  box.querySelectorAll('.unit-toggle button').forEach(b=>b.onclick=()=>{
+    box.querySelectorAll('.unit-toggle button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); state[unitKey]=b.dataset.u; box.querySelector('.big-value small').textContent=b.dataset.u;
+  });
+}
+
+/* ---------- RESUMO DO NÍVEL + IMC ---------- */
+function renderImc(step,wrap){
+  wrap.appendChild(el(`<h1 class="q-title sm" style="text-align:left;max-width:34rem;margin:0 auto 1.2rem">${step.title}</h1>`));
+  // calcular IMC
+  const alturaM = state.altura/100;
+  const imc = state.peso/(alturaM*alturaM);
+  const imcR = imc.toFixed(1).replace('.',',');
+  let cat='NORMAL', pos=45;
+  if(imc<18.5){cat='ABAIXO DO PESO';pos=12;}
+  else if(imc<25){cat='NORMAL';pos=38;}
+  else if(imc<30){cat='SOBREPESO';pos=62;}
+  else{cat='OBESIDADE';pos=85;}
+  const nivel = (state.experiencia||'Sou iniciante').replace(/^Sou /,'').split('\n')[0];
+  const nivelUp = nivel.toUpperCase();
+  wrap.appendChild(el(`<div class="imc-top">
+    <img class="imc-char" src="assets/resumo-corpo.png" alt="" onerror="this.style.display='none'"/>
+    <div class="imc-cards">
+      <div class="imc-cardbox"><p>Nível de dança</p><b>💃🏼 ${nivelUp}</b></div>
+      <div class="imc-cardbox"><p>Tipo de corpo</p><b>📍 Regular</b></div>
+      <div class="imc-cardbox"><p>Nível metabólico</p><b>📉 Lento</b></div>
+    </div>
+  </div>`));
+  wrap.appendChild(el(`<div class="imc-label">ÍNDICE DE MASSA CORPORAL (IMC)</div>`));
+  wrap.appendChild(el(`<div class="imc-obs">OBS:</div>`));
+  const badgePos = Math.min(78, Math.max(22, pos)); // keep badge on-screen
+  wrap.appendChild(el(`<div class="imc-bar-wrap">
+    <div class="imc-badge" style="left:${badgePos}%">Você: ${imcR} (${cat})</div>
+    <div class="imc-bar"></div>
+    <div class="imc-marker" style="left:${pos}%"></div>
+  </div>`));
+  wrap.appendChild(el(`<div class="imc-alert">Riscos de um IMC não saudável: Pressão arterial elevada, condições cardiovasculares, acidentes vasculares cerebrais, diabetes, Mellitus tipo 2, certos tipos de câncer, doença articular degenerativa, desconforto lombar e aumento geral de outros riscos.</div>`));
+  const cta=el(`<button class="cta">Continuar</button>`); cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
+}
+
+/* ---------- CHART: projeção por data (linha animada vermelho→verde) ---------- */
+function renderChartData(step,wrap){
+  wrap.appendChild(el(`<h1 class="q-title sm">${step.title}</h1>`));
+  wrap.appendChild(el(`<p class="q-sub">Com base em suas respostas e nas histórias de sucesso de nossas usuárias, você conseguirá alcançar seu peso alvo de <b style="color:var(--theme-darker)">${state.metaPeso}kg até ${fmtDatePlus(28)}</b>. Prepare-se para impressionar a todos!</p>`));
+  const card=el(`<div class="chart-card">${dateSVG(state.peso,state.metaPeso)}</div>`);
+  wrap.appendChild(card);
+  wrap.appendChild(el(`<div class="goal-line"><b>${state.metaPeso} kg</b> em 28 dias</div>`));
+  const cta=el(`<button class="cta">Continuar</button>`); cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
+}
+
+/* curva por data com grade tracejada, pills e desenho animado */
+function dateSVG(atual,meta){
+  const W=520,H=290,padL=46,padR=34,padT=40,padB=42;
+  const x0=padL,x1=W-padR,y0=padT,y1=H-padB;
+  const n=40,pts=[];
+  for(let i=0;i<=n;i++){const t=i/n;const ease=1-Math.pow(1-t,2.1);pts.push([x0+t*(x1-x0), y0+ease*(y1-y0)*0.8]);}
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=d+` L ${x1} ${y1} L ${x0} ${y1} Z`;
+  const gridV=[0,1/3,2/3,1].map(t=>{const x=x0+t*(x1-x0);return `<line x1="${x}" y1="${y0-10}" x2="${x}" y2="${y1}" stroke="#e5e7eb" stroke-dasharray="4 4"/>`;}).join('');
+  const gridH=[0,25,50,75].map(v=>{const y=y1-(v/85)*(y1-y0);return `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#f1f5f9"/><text x="${x0-8}" y="${y+4}" font-size="11" fill="#9ca3af" text-anchor="end">${v}</text>`;}).join('');
+  const labels=['Hoje','10 dias','20 dias','28 dias'].map((l,i)=>{const x=x0+(i/3)*(x1-x0);return `<text x="${x}" y="${H-10}" font-size="11" fill="#9ca3af" text-anchor="middle" font-weight="700">${l}</text>`;}).join('');
+  const mids=[1/3,2/3].map(t=>{const p=pts[Math.round(t*n)];return `<circle cx="${p[0]}" cy="${p[1]}" r="8" fill="#e5e7eb" opacity=".8"/><circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${t<.5?'#ef4444':'#f59e0b'}"/>`;}).join('');
+  const s=pts[0],e2=pts[n];
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="dg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="55%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#22c55e"/></linearGradient>
+      <linearGradient id="da" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444" stop-opacity=".28"/><stop offset="100%" stop-color="#22c55e" stop-opacity=".22"/></linearGradient>
+    </defs>
+    ${gridH}${gridV}
+    <path d="${area}" fill="url(#da)"/>
+    <path class="chart-line" d="${d}" fill="none" stroke="url(#dg)" stroke-width="4" stroke-linecap="round"/>
+    ${mids}
+    <circle cx="${s[0]}" cy="${s[1]}" r="9" fill="#fecaca"/><circle cx="${s[0]}" cy="${s[1]}" r="5.5" fill="#ef4444"/>
+    <circle cx="${e2[0]}" cy="${e2[1]}" r="9" fill="#bbf7d0"/><circle cx="${e2[0]}" cy="${e2[1]}" r="5.5" fill="#16a34a"/>
+    <g><rect x="${s[0]-10}" y="${s[1]-36}" rx="7" width="70" height="25" fill="#dc2626"/><text x="${s[0]+25}" y="${s[1]-18}" font-size="13" fill="#fff" font-weight="900" text-anchor="middle">${atual} kg</text></g>
+    <g><rect x="${e2[0]-140}" y="${e2[1]-42}" rx="7" width="140" height="27" fill="#fff" stroke="#e5e7eb"/><text x="${e2[0]-70}" y="${e2[1]-24}" font-size="12" fill="#111827" font-weight="800" text-anchor="middle">${meta} kg em 28 dias</text></g>
+    ${labels}
+  </svg>`;
+}
+
+/* SVG descending curve */
+function curveSVG(atual,meta,labels){
+  const W=520,H=200,pad=30;
+  const drop=Math.max(0,atual-meta);
+  const y0=pad+10, y1=H-pad-10;
+  const pts=[];
+  const n=40;
+  for(let i=0;i<=n;i++){
+    const t=i/n;
+    const ease=1-Math.pow(1-t,2.2);
+    const x=pad+t*(W-2*pad);
+    const y=y0+ease*(y1-y0);
+    pts.push([x,y]);
+  }
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=d+` L ${W-pad} ${H-pad} L ${pad} ${H-pad} Z`;
+  const lbl=labels.map((l,i)=>{const x=pad+(i/(labels.length-1))*(W-2*pad);return `<text x="${x}" y="${H-8}" font-size="11" fill="#9ca3af" text-anchor="middle" font-weight="700">${l}</text>`;}).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f87171" stop-opacity=".35"/><stop offset="100%" stop-color="#f87171" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#g)"/>
+    <path d="${d}" fill="none" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="${pts[0][0]}" cy="${pts[0][1]}" r="6" fill="#ef4444"/>
+    <circle cx="${pts[pts.length-1][0]}" cy="${pts[pts.length-1][1]}" r="7" fill="#16a34a"/>
+    <text x="${pts[0][0]}" y="${pts[0][1]-12}" font-size="13" fill="#111" font-weight="900" text-anchor="start">${atual}kg</text>
+    <text x="${pts[pts.length-1][0]}" y="${pts[pts.length-1][1]-12}" font-size="13" fill="#16a34a" font-weight="900" text-anchor="end">${meta}kg</text>
+    ${lbl}
+  </svg>`;
+}
+
+/* ---------- RESUMO DO PLANO ---------- */
+function renderResumo(step,wrap){
+  const nome = state.nome? state.nome : "você";
+  const metabolismo = state.metabolismo==='ENGORDO COM FACILIDADE'?'Ganha peso com facilidade':(state.metabolismo? state.metabolismo.charAt(0)+state.metabolismo.slice(1).toLowerCase() :'Metabolismo lento');
+  wrap.appendChild(el(`<div class="plano-hero">
+    <img src="assets/plano-char.png" alt="" onerror="this.style.display='none'"/>
+    <div class="plano-title"><span>plano</span><b>DanceFit</b><em>da ${nome}</em></div>
+  </div>`));
+  wrap.appendChild(el(`<p class="q-sub" style="margin-top:.4rem">Criamos um <b style="color:var(--theme)">plano 100% personalizado</b> com base nas suas respostas</p>`));
+  const rows=[
+    [`Metabolismo atual da ${nome}:`, metabolismo],
+    ['Rotina ideal', '15 min por dia'],
+    ['Nível', 'Iniciante'],
+    ['Objetivo:', (state.objetivo||'Perder peso')+' com leveza'],
+    ['Resultado esperado:', 'Mais energia + emagrecimento progressivo']
+  ];
+  const card=el(`<div class="plano-list"></div>`);
+  rows.forEach(([t,v])=>card.appendChild(el(`<div class="plano-box"><b>${t}</b><span>${v}</span></div>`)));
+  wrap.appendChild(card);
+  const cta=el(`<button class="cta" style="opacity:0" disabled>Continuar</button>`);
+  cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
+  // blocos aparecem um a um (mecânica do original)
+  const boxes=[...card.children];
+  boxes.forEach((b,i)=>setTimeout(()=>b.classList.add('show'), 450+i*700));
+  setTimeout(()=>{ cta.removeAttribute('disabled'); cta.style.transition='opacity .5s'; cta.style.opacity='1'; }, 450+boxes.length*700);
+}
+
+/* ---------- SALES PAGE ---------- */
+function goCheckout(){ window.location.href = CHECKOUT_URL; }
+
+function renderSales(wrap){
+  const nome=state.nome?`, ${state.nome}`:'';
+  const s=el(`<div class="sales">
+    <h1>Acesse já o seu plano de emagrecimento com dança${nome}!</h1>
+
+    <div class="hero-compare"><img src="assets/compare3d.png" alt="Agora vs Seu objetivo" onerror="this.style.display='none'"/></div>
+
+    <div class="benefit"><span class="ck">✅</span><span>Plano pessoal de perda de peso de 28 dias adaptado à sua idade, tipo corporal e IMC</span></div>
+    <div class="benefit"><span class="ck">✅</span><span>Treinos curtos, mas eficazes. Apenas 10 minutos por dia para queimar gordura rapidamente</span></div>
+    <div class="benefit"><span class="ck">✅</span><span>Mais de 300 treinos de dança diversos e programas especiais</span></div>
+    <div class="benefit"><span class="ck">✅</span><span>Possibilidade de praticar em qualquer lugar e sem equipamento</span></div>
+    <div class="benefit"><span class="ck">✅</span><span>Estilos de dança mais populares – experimente um novo todos os dias</span></div>
+
+    <div class="timer"><div class="tu"><b class="tmin">08</b><span>min</span></div><i>:</i><div class="tu"><b class="tsec">17</b><span>seg</span></div></div>
+
+    <div class="price-box">
+      <div class="price-tag">Pagamento único</div>
+      <div class="price-main">6x <span>de</span> R$ 5,66</div>
+      <div class="price-alt">ou R$29 à vista</div>
+      <button class="cta big green buy">Quero começar agora</button>
+      <div class="secure-pill">🛡️ Pagamento 100% seguro</div>
+    </div>
+
+    <div class="section-h">Como irei receber meu acesso?</div>
+    <div class="access-card">📩 Logo após finalizar seu cadastro você recebe um e-mail <b>imediato</b> com o seu acesso à nossa <b>Área de Alunas</b>!</div>
+    <div class="access-card">▶️ Dentro da Área de Alunas suas aulas já chegam organizadas — <b>uma aula para cada dia da semana</b>. É só dar play e começar!</div>
+
+    <div class="guarantee">
+      <img src="assets/selo-garantia.webp" alt="Garantia" onerror="this.style.display='none'"/>
+      <h3>Garantia de 100% do seu dinheiro de volta</h3>
+      <p>Estamos confiantes na qualidade do nosso plano – dezenas de milhares de alunas já obtiveram resultados visíveis. Siga seu plano diário e, se não ver resultado, devolvemos cada centavo.</p>
+    </div>
+
+    <div class="section-h">Pessoas como você obtiveram grandes resultados usando nossos <em>Planos Dancefit</em>.</div>
+    <div id="car1"></div>
+
+    <div class="section-h">Resultados que nos orgulham!</div>
+    <div id="car2"></div>
+
+    <div class="timer"><div class="tu"><b class="tmin">08</b><span>min</span></div><i>:</i><div class="tu"><b class="tsec">17</b><span>seg</span></div></div>
+
+    <div class="price-box trial">
+      <div class="trial-head">
+        <div><b>TESTE POR 7 DIAS</b><span>Sem compromisso</span></div>
+        <div class="trial-price"><small>Apenas</small><b>R$29</b><small>à vista</small></div>
+      </div>
+      <button class="cta big green buy">Quero começar agora</button>
+      <div class="pay-row">
+        <img class="bandeiras" src="assets/bandeiras.webp" alt="Formas de pagamento" onerror="this.style.display='none'"/>
+        <span class="secure-pill">🛡️ Pagamento 100% seguro</span>
+      </div>
+    </div>
+
+    <div class="section-h">O que as pessoas costumam perguntar</div>
+    <div id="faq"></div>
+
+    <div class="testi"><div class="av">AC</div><div><div class="stars">★★★★★</div><div class="name">Amanda Cristina</div><div class="handle">CRIS_Amanda</div><div class="txt">Percebi que era hora de mudar, não estava me reconhecendo e em 28 dias tudo melhorou</div></div></div>
+    <div class="testi"><div class="av">RN</div><div><div class="stars">★★★★</div><div class="name">Rafaela Nascimento</div><div class="handle">@VenusRafa</div><div class="txt">Gente, to chocada kkkk Olha isso! Né que dançar resolve tudo msm</div></div></div>
+    <div class="testi"><div class="av">LC</div><div><div class="stars">★★★★★</div><div class="name">Luana_Caroline</div><div class="handle">@LuaCAguiar</div><div class="txt">To passada! Amando meus planos e até trouxe o maridão pra dançar junto HAHAH</div></div></div>
+
+    <img class="seal7" src="assets/selo-garantia.webp" alt="7 dias de garantia" onerror="this.style.display='none'"/>
+    <button class="cta big green buy">Quero começar agora</button>
+    <div class="secure-pill center-pill">🛡️ Pagamento 100% seguro</div>
+  </div>`);
+  wrap.appendChild(s);
+
+  /* carrosséis de antes/depois */
+  s.querySelector('#car1').appendChild(buildCarousel([
+    'assets/antes-depois-3.jpg','assets/antes-depois-2.png','assets/carrossel.webp'
+  ]));
+  s.querySelector('#car2').appendChild(buildCarousel([
+    'assets/antes-depois-1.webp','assets/vivabem-antesdepois.webp','assets/prova.jpg'
+  ]));
+
+  const faqs=[
+    ["O que é o Dancefit?","O Dancefit é um aplicativo que oferece a dança como rotina para perder peso. Uma variedade de estilos de dança adaptados em exercícios de 5 a 30 minutos vão te levar ao verdadeiro ritmo do seu corpo."],
+    ["O que é um programa pessoal?","É um desafio de dança de 28 dias feito sob medida com base nos seus objetivos e preferências. Você escolhe treinos de 5 a 30 minutos e o nível — do iniciante ao avançado."],
+    ["Quando verei os resultados?","Embora dependa de vários fatores, você poderá começar a ver resultados visíveis nos primeiros 28 dias!"],
+    ["Como recebo meu acesso?","Logo após finalizar seu cadastro você receberá um e-mail imediato com o acesso à nossa Área de Alunas, com todas as aulas organizadas — uma para cada dia. É só dar play!"]
+  ];
+  const faqBox=s.querySelector('#faq');
+  faqs.forEach(([q,a])=>{
+    const item=el(`<div class="faq-item"><div class="faq-q">${q}<span class="chev">▾</span></div><div class="faq-a">${a}</div></div>`);
+    item.querySelector('.faq-q').onclick=()=>item.classList.toggle('open');
+    faqBox.appendChild(item);
+  });
+
+  s.querySelectorAll('.buy').forEach(b=>b.onclick=goCheckout);
+
+  /* countdown sincronizado nos dois timers */
+  let total=8*60+17;
+  clearInterval(window.__t);
+  window.__t=setInterval(()=>{ if(total<=0)return; total--;
+    const m=String(Math.floor(total/60)).padStart(2,'0'),sec=String(total%60).padStart(2,'0');
+    s.querySelectorAll('.tmin').forEach(e=>e.textContent=m);
+    s.querySelectorAll('.tsec').forEach(e=>e.textContent=sec);
+  },1000);
+}
+
+/* carrossel automático com dots */
+function buildCarousel(imgs){
+  const c=el(`<div class="carousel-wrap"><div class="carousel"><div class="car-track"></div></div><div class="car-dots"></div></div>`);
+  const tr=c.querySelector('.car-track'),dots=c.querySelector('.car-dots');
+  imgs.forEach((src,k)=>{
+    tr.appendChild(el(`<div class="car-slide"><img src="${src}" alt="" onerror="this.style.display='none'"/></div>`));
+    dots.appendChild(el(`<span class="car-dot ${k===0?'on':''}"></span>`));
+  });
+  let i=0;const n=imgs.length;
+  const show=k=>{i=(k+n)%n;tr.style.transform=`translateX(-${i*100}%)`;[...dots.children].forEach((d,j)=>d.classList.toggle('on',j===i));};
+  setInterval(()=>show(i+1),3500);
+  [...dots.children].forEach((d,j)=>d.onclick=()=>show(j));
+  return c;
+}
+
+/* boot */
+render();
+</script>
+</body>
+</html>
