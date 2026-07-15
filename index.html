@@ -106,8 +106,8 @@
   .opt.card-grid{flex-direction:column;text-align:center;justify-content:center;gap:.5rem;padding:1.1rem .6rem;min-height:118px}
   .opt.card-grid .emoji{font-size:2rem}
   /* layout com imagem lateral (mulher dançando à esquerda, sem sobrepor nada) */
-  .side-layout{display:grid;grid-template-columns:minmax(96px,34%) 1fr;gap:.5rem;align-items:end;max-width:34rem;margin:0 auto}
-  .side-img{width:100%;object-fit:contain;margin-bottom:.2rem}
+  .side-layout{display:grid;grid-template-columns:minmax(110px,38%) 1fr;gap:.6rem;align-items:center;max-width:34rem;margin:0 auto}
+  .side-img{width:100%;object-fit:contain;transition:opacity .25s ease;align-self:center}
   .side-opts{min-width:0}
   .side-opts .options{max-width:none;margin:0}
   .opt .emoji-right{margin-left:auto;font-size:1.5rem;flex-shrink:0}
@@ -279,12 +279,16 @@
   .loader h1{font-size:1.5rem;font-weight:900;color:var(--title);margin-bottom:.5rem}
   .loader .lead{color:var(--muted);font-weight:700;margin-bottom:1.6rem}
   .load-list{display:flex;flex-direction:column;gap:.2rem;text-align:left;margin-top:1rem;background:#fff;border-radius:1.2rem;padding:1.2rem 1.1rem;box-shadow:0 10px 30px rgba(0,0,0,.07)}
-  .load-item{padding:.6rem 0;display:flex;align-items:flex-start;gap:.85rem;opacity:.3;transition:opacity .45s;position:relative}
-  .load-item:not(:last-child)::before{content:'';position:absolute;left:14px;top:40px;bottom:-6px;width:2px;background:#fbd3da}
+  .load-item{padding:.6rem 0;display:flex;align-items:flex-start;gap:.85rem;opacity:.35;transition:opacity .6s ease;position:relative}
+  .load-item:not(:last-child)::before{content:'';position:absolute;left:14px;top:40px;bottom:-6px;width:2px;background:#fbd3da;overflow:hidden}
+  .load-item.done::before{background:linear-gradient(#f87171,#fbd3da)}
   .load-item.done,.load-item.active{opacity:1}
-  .load-item .ico{width:30px;height:30px;border-radius:50%;background:#fbd3da;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;position:relative;z-index:1}
+  .load-item .ico{width:30px;height:30px;border-radius:50%;background:#fbd3da;color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;position:relative;z-index:1;transition:background .4s ease}
   .load-item.done .ico{background:var(--theme)}
-  .load-item.active .ico{background:var(--theme);animation:beat 1s infinite}
+  .load-item.active .ico{background:var(--theme);box-shadow:0 0 0 0 rgba(248,113,113,.55);animation:pulsering 1.5s infinite}
+  .load-item.pop{animation:popin .5s ease}
+  @keyframes popin{0%{transform:translateX(-6px);opacity:.35}100%{transform:none;opacity:1}}
+  @keyframes pulsering{0%{box-shadow:0 0 0 0 rgba(248,113,113,.55)}70%{box-shadow:0 0 0 12px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
   @keyframes spin{to{transform:rotate(360deg)}}
   .load-item b{font-weight:800;color:var(--title);display:block;font-size:.98rem}
   .load-item span{font-size:.8rem;color:var(--muted);font-weight:600}
@@ -419,7 +423,7 @@ const state = {
   faixa:null, objetivo:null, fisico:null, corpoSonho:null, foco:[], sensiveis:[],
   melhorForma:null, experiencia:null, metabolismo:null, frequencia:null,
   duracao:null, ritmo:null, altura:180, peso:70, metaPeso:65, nome:"",
-  evento:null, unidadeAltura:"cm", unidadePeso:"kg"
+  evento:[], unidadeAltura:"cm", unidadePeso:"kg"
 };
 
 /* ============ DEFINIÇÃO DAS TELAS DO FUNIL ============ */
@@ -462,7 +466,15 @@ const STEPS = [
     img:"assets/mulheres-40plus.jpg",
     caption:"Vamos criar o seu plano personalizado" },
   /* 4 — foco (múltipla) com imagem lateral + checkbox */
-  { type:"multi", key:"foco", advance:true, sideImg:"assets/leti.png", checkbox:true,
+  { type:"multi", key:"foco", advance:true, checkbox:true,
+    sideImg:"assets/foco-total.png",
+    sideImgMap:{
+      "Braços tonificados":"assets/foco-bracos.png",
+      "Barriga plana":"assets/foco-barriga.png",
+      "Bumbum redondo":"assets/foco-bumbum.png",
+      "Pernas":"assets/foco-pernas.png",
+      "Emagrecimento total":"assets/foco-total.png"
+    },
     title:"Quais partes do seu corpo você está mais focada em melhorar?",
     options:[
       {label:"Braços tonificados"},{label:"Barriga plana"},{label:"Bumbum redondo"},
@@ -494,7 +506,7 @@ const STEPS = [
   /* notícia — você NÃO precisa sofrer (vem depois da pergunta da frase) */
   { type:"news",
     title:"Você NÃO precisa sofrer para emagrecer",
-    img:"assets/vivabem-antesdepois.webp",
+    img:"assets/maefilha.png",
     caption:"Jaime e Jean praticam modalidade que combina dança com exercícios de força",
     source:"Imagem: Reprodução do Instagram",
     headline:"Mãe e filha emagrecem 83 kg com aula de dança que queima 800 calorias",
@@ -561,7 +573,7 @@ const STEPS = [
   { type:"nome", title:"Qual é o seu nome?",
     sub:"Queremos criar um plano 100% personalizado para você! Para que tenha o melhor resultado possível" },
   /* 17 — evento */
-  { type:"single", key:"evento", advance:false,
+  { type:"multi", key:"evento", advance:true,
     title:"Você tem algum evento importante chegando?",
     sub:"Ter algo emocionante te esperando fará você se sentir mais motivada.",
     grid:true,
@@ -624,16 +636,48 @@ function renderOptions(step, container){
         const arr=state[step.key];
         const i=arr.indexOf(o.label);
         if(i>=0)arr.splice(i,1); else arr.push(o.label);
-        render(); // refresh selection state + enable CTA
+        // atualiza SÓ este botão (sem re-renderizar => sem piscar)
+        const on=arr.includes(o.label);
+        b.classList.toggle('selected',on);
+        const chk=b.querySelector('.opt-check'); if(chk)chk.textContent=on?'✓':'';
+        updateAdvanceCta(step);
+        updateSideImg(step);
       }else{
         state[step.key]=o.label;
-        if(step.advance){ render(); } // show highlight then user taps continue
+        // marca visualmente sem re-render
+        box.querySelectorAll('.opt').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        if(step.advance){ updateAdvanceCta(step); updateSideImg(step); }
         else { setTimeout(()=>go(idx+1),180); }
       }
     };
     box.appendChild(b);
   });
   container.appendChild(box);
+}
+
+/* habilita/desabilita o botão Continuar sem re-renderizar a tela */
+function updateAdvanceCta(step){
+  const cta=main.querySelector('.step > .cta, .step .cta');
+  if(!cta) return;
+  const ok = step.type==='multi' ? state[step.key].length>0 : !!state[step.key];
+  cta.toggleAttribute('disabled', !ok);
+}
+
+/* troca a imagem lateral conforme a opção marcada (tela "foco") */
+function updateSideImg(step){
+  if(!step.sideImg) return;
+  const img=main.querySelector('.side-img');
+  if(!img) return;
+  const sel = state[step.key];
+  const arr = Array.isArray(sel)?sel:(sel?[sel]:[]);
+  const last = arr[arr.length-1];
+  const map = step.sideImgMap||{};
+  const src = (last && map[last]) || step.sideImg;
+  if(img.getAttribute('src')!==src){
+    img.style.opacity='0';
+    setTimeout(()=>{ img.src=src; img.style.opacity='1'; }, 120);
+  }
 }
 
 function render(){
@@ -704,11 +748,15 @@ function render(){
           <div class="ritmo-head">${o.label}<span>${o.desc||''}</span></div>
           <img src="${o.img}" alt="" onerror="this.style.display='none'"/>
         </div>`);
-        c.onclick=()=>{ state[step.key]=o.label; render(); };
+        c.onclick=()=>{ state[step.key]=o.label;
+          box.querySelectorAll('.ritmo-card').forEach(x=>x.classList.remove('selected'));
+          c.classList.add('selected');
+          cta.removeAttribute('disabled');
+        };
         box.appendChild(c);
       });
       wrap.appendChild(box);
-      const cta=el(`<button class="cta" ${state[step.key]?'':'disabled'}>Continuar</button>`);
+      var cta=el(`<button class="cta" ${state[step.key]?'':'disabled'}>Continuar</button>`);
       cta.onclick=()=>go(idx+1); wrap.appendChild(cta);
       break;
     }
@@ -867,9 +915,9 @@ function renderLoader(step,wrap,simple){
   let i=0;
   const items=[...list.children];
   function tick(){
-    if(i>0)items[i-1].classList.remove('active'),items[i-1].classList.add('done'),items[i-1].querySelector('.ico').textContent='✓';
-    if(i<items.length){ items[i].classList.add('active'); i++; setTimeout(tick,850); }
-    else { setTimeout(()=>go(idx+1),500); }
+    if(i>0){const p=items[i-1];p.classList.remove('active');p.classList.add('done');p.querySelector('.ico').textContent='✓';}
+    if(i<items.length){ items[i].classList.add('active','pop'); i++; setTimeout(tick,1700); }
+    else { setTimeout(()=>go(idx+1),900); }
   }
   tick();
 }
@@ -1138,7 +1186,7 @@ function renderSales(wrap){
     'assets/antes-depois-3.jpg','assets/antes-depois-2.png','assets/carrossel.webp'
   ]));
   s.querySelector('#car2').appendChild(buildCarousel([
-    'assets/antes-depois-1.webp','assets/vivabem-antesdepois.webp','assets/prova.jpg'
+    'assets/antes-depois-1.webp','assets/maefilha.png','assets/prova.jpg'
   ]));
 
   const faqs=[
